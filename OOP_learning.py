@@ -193,6 +193,3 @@ os.path.exists(cache_patch)
 # with open(f'{sequence_key}.pkl', 'wb') as pickle_file:  
 #     pickle_test = pickle.dump(sequence_key, pickle_file)
 # pickle_file.close()
-
-
-
