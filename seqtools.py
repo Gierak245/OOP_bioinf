@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jul  3 09:57:22 2025
-
-@author: giera
-"""
-from  OOP_learning import Sequence, disk_cache
+from  OOP_kmer_cache import Sequence, disk_cache
 import argparse
 import os
 import pickle
@@ -17,7 +11,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("-i", "--input", required=True, help="Input file path")
 parser.add_argument("-o","--output", required = True, help="Output path for your pickle file")
-parser.add_argument("--clear_cache", default=False ,choices=[True, False] ,help="Clears out cache folder. True = Yes, False = No")
+parser.add_argument("--clear_cache", default=True ,choices=[True, False] ,help="Clears out cache folder. True = Yes, False = No")
 
 args = parser.parse_args()
 
@@ -55,30 +49,26 @@ def main():
     print(f"Wrote {len(all_kmers)} records to {all_kmers_path} (with file combining them all named: all_kmers.pkl)")
     
     if args.clear_cache:
+        # loading files and creating old_files list
+        old_files = []
         for file in os.listdir(args.output):
-            to_remove = re.match(".*pkl", file).string
-            os.remove(f'{args.output}/{to_remove}')
-
-    # loading files and creating old_files list
-    old_files = []
-    for file in os.listdir(args.output):
-        # defining names of files to later loop through
-        filepath = os.path.normpath(os.path.join(args.output, file))
+            # defining names of files to later loop through
+            filepath = os.path.normpath(os.path.join(args.output, file))
+            
+            # calculatnig file age
+            mtime = os.path.getmtime(filepath)
+            file_age = datetime.fromtimestamp(mtime).date()
+            now = datetime.now().date()
+            age = now - file_age
+            if age.days >= 7:
+                old_files.append(filepath)
         
-        # calculatnig file age
-        mtime = os.path.getmtime(filepath)
-        file_age = datetime.fromtimestamp(mtime).date()
-        now = datetime.now().date()
-        age = now - file_age
-        if age.days >= 7:
-            old_files.append(filepath)
-    
-    with zipfile.ZipFile(zip_path, 'w') as archive:
-        for filename in old_files:
-            archive.write(filename, arcname=os.path.basename(filename))
-    
-    for filepath in old_files:
-        os.remove(filepath)
+        with zipfile.ZipFile(zip_path, 'w') as archive:
+            for filename in old_files:
+                archive.write(filename, arcname=os.path.basename(filename))
+        
+        for filepath in old_files:
+            os.remove(filepath)
     
 if __name__ == "__main__":
     main()
