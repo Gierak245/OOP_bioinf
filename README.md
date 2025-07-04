@@ -19,7 +19,7 @@ cache archiving, and pruning of old entries.
 
 ### `CLI (seq_toolkit.py)`:
 * -i/--input: FASTA or FASTQ file
-*-o/--output: cache directory and location for all and aggregated results (all_kmers.pkl)
+*-o/--output: cache directory and location for per sentence and aggregated results (all_kmers.pkl)
 * --clear_cache: archive & prune cache entries older than 7 days
 
 ## Installation
@@ -33,7 +33,7 @@ cd OOP_bioinf
 ## Usage
 
 ```
-python seq_toolkit.py \
+python seqtools.py \
   -i path/to/input.fa \
   -o path/to/cache_dir \
   --clear_cache True
