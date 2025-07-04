@@ -46,7 +46,6 @@ def disk_cache(cache_dir="cache"):
     return decorator
 
 
-
 class Sequence:
     
     def __init__(self, header, sequence_string, quality):

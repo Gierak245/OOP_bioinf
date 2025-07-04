@@ -7,6 +7,7 @@ import zlib
 import zipfile
 from datetime import datetime, date
 
+# Creating arguments
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-i", "--input", required=True, help="Input file path")
@@ -14,10 +15,8 @@ parser.add_argument("-o","--output", required = True, help="Output path for your
 parser.add_argument("--clear_cache", default=True ,choices=[True, False] ,help="Clears out cache folder. True = Yes, False = No")
 
 args = parser.parse_args()
-
+# Determining fasta formats
 fasta_formats = ('fasta', 'fa', 'fna', 'ffn', 'faa', 'frn', 'mpfa')
-
-file = 'test.fa'
 
 zip_path = os.path.join(args.output, 'old_cache.zip')
 
