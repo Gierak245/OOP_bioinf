@@ -1,17 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Jun 30 19:22:59 2025
-
-@author: giera
-"""
-
 from hashlib import sha256
 import os
 import pickle
 from functools import wraps
 import re
-
-
 
 def disk_cache(cache_dir="cache"):
     
@@ -167,84 +158,3 @@ Length: {len(self.sequence_string)}
         
         return k_mers
         
-
-seq = Sequence.from_fasta(">s1\nATGC\n")
-# First call: should compute and create "cache/<hash>.pkl"
-db1 = seq.expensive_kmer()
-# Second call: should load from disk, not recompute
-db2 = seq.expensive_kmer()
-
-fasta = """>seq1
-        AGCTTGA
-        GCTTATT
-        CCCAAGT"""
-
-fastq = """@seq2
-GGTTAACC
-+
-IIIIIIII
-"""
-
-# for line in text.strip().splitlines(): print(line.startswith(">"))
-
-test_fasta = Sequence.from_fasta(fasta)
-test_fasta
-
-test_fastq = Sequence.from_fastq(fastq)
-test_fastq
-
-
-cache_patch = "C:/Users/giera/OneDrive/Dokumenty/Python_Scripts/cache"
-
-# creating key and assiging sequence 
-key = sha256(test_fasta.sequence_string.encode()).hexdigest()
-db = {}
-db[key] = test_fasta.sequence_string
-
-# Checking if catche path is present 
-os.path.exists(cache_patch)
-
-fasta_file = os.path.normpath(r"C:\Users\giera\OneDrive\Dokumenty\Python_Scripts\OOP\ex_fasta.txt")
-
-for seq in Sequence.parse_fasta_file(fasta_file):
-    kmer_dict = seq.expensive_kmer()
-
-# path_to_pckle = os.path.normpath(os.path.join(cache_patch, f'{key}.pkl'))
-# print(path_to_pckle)
-# print(os.path.exists(path_to_pckle))
-
-
-# with open('test.pkl', 'rb') as f:
-#     db1 = pickle.load(f)
-#     print(db1)
-
-# seq = "ATTGCC"
-
-# def expensive(seq):
-    
-#     k = len(seq)
-#     k_mers = {}
-
-#     for i in range(1, k + 1):
-#         temp_list = []
-#         for j in range(0, k + 1):
-#             if j + i <= k:
-#                 temp_list.append(seq[j : j + i])
-#             k_mers[i] = temp_list
-    
-#     return k_mers
-
-# k_mers = expensive(test_fasta.sequence_string)
-
-# sequence_key = sha256(test_fasta.sequence_string.encode()).hexdigest()
-
-# with open(f'{sequence_key}.pkl', 'wb') as pickle_file:  
-#     pickle_test = pickle.dump(sequence_key, pickle_file)
-# pickle_file.close()
-
-# for file in os.listdir('cache'):
-#     print(re.match(".*pkl", file).string)
-#     to_remove = re.match(".*pkl", file).string
-#     os.remove(f'cache/{to_remove}')
-
-# os.listdir('cache')

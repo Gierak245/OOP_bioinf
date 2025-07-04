@@ -80,6 +80,5 @@ def main():
     for filepath in old_files:
         os.remove(filepath)
     
-
 if __name__ == "__main__":
     main()
