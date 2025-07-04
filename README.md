@@ -40,4 +40,4 @@ python seqtools.py \
 ```
 - Output directory will contain `all_kmers.pkl` and cached `.pkl` per sequence.
 - On subsequent runs, cached results are reused automatically.
-  *Note: To test the function, example files in FASTA (ex_fasta.fa) and FASTQ (ex_fastq.fastq) format are provided.*
+- *Note: To test the function, example files in FASTA (ex_fasta.fa) and FASTQ (ex_fastq.fastq) format are provided.*
