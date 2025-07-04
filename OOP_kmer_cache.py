@@ -5,7 +5,7 @@ from functools import wraps
 import re
 
 def disk_cache(cache_dir="cache"):
-    
+    # checks if cache directory exists
     if os.path.exists(cache_dir) != True:
         os.makedirs(cache_dir)
         
