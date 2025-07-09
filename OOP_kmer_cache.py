@@ -4,7 +4,21 @@ import pickle
 from functools import wraps
 import re
 
-def disk_cache(cache_dir="cache"):
+def disk_cache(cache_dir:str ="cache"):
+    """
+    Creates cache folder and decorator used for creating .pkl files from Sequence class.
+
+    Parameters
+    ----------
+    cache_dir : str, optional
+        Path to cache folder. The default is "cache".
+
+    Returns
+    -------
+    Callable[[Callable], Callable]
+        A decorator that wraps a function taking a Sequence and returns its cached result.
+
+    """
     # checks if cache directory exists
     if os.path.exists(cache_dir) != True:
         os.makedirs(cache_dir)
@@ -19,12 +33,12 @@ def disk_cache(cache_dir="cache"):
                 
                 # hetting sequence from Class
                 seq_text = arg.sequence_string
-                key = sha256(seq_text.encode('utf‑8')).hexdigest()
+                key = sha256(seq_text.encode('utf‑8')).hexdigest()  # creating unique key value for .pkl file
             
-            # path to pickle file in cache folder
+            # creating path to pickle file in cache folder
             key_path = os.path.normpath(os.path.join(cache_dir, f'{key}.pkl'))
             
-            # Loading or creating and than loading a pkl file.
+            # Loading, or creating and than loading, a .pkl file.
             if os.path.exists(key_path) == True:
                 print(f"Loading from cache data for {arg.header}")
                 with open(key_path, 'rb') as pickle_file:  
@@ -47,8 +61,21 @@ def disk_cache(cache_dir="cache"):
 
 
 class Sequence:
-    
+    """
+    Represents a biological sequence parsed from FASTA or FASTQ.
+
+    Attributes
+    ----------
+    header : str
+        The record identifier.
+    sequence_string : str
+        The nucleotide (or amino‑acid) string.
+    quality : Optional[str]
+        Quality scores (only for FASTQ), otherwise None.
+    """
+
     def __init__(self, header, sequence_string, quality):
+        """Initialize with header, sequence, and optional quality."""
         self.header = header
         self.sequence_string = sequence_string
         self.quality = quality
@@ -62,9 +89,27 @@ Length: {len(self.sequence_string)}
     # Classmethod creating a Sequence Class from fasta file
     @classmethod
     def from_fasta(cls, text: str):
-        
+        """
+        Parse a single FASTA record into a Sequence object.
+
+        Parameters
+        ----------
+        text : str
+            Two‑line FASTA record, including the leading '>'.
+
+        Raises
+        ------
+        ValueError
+            If fasta sequence lines are empty
+
+        Returns
+        -------
+        Sequence
+            A new Sequence instance with header, sequence_string, and quality == None attributes.
+
+        """
         # creating temp headers and seq
-        header = ''
+        header = None
         sequence_string = ''
         
         # loop to get header and sequence from file
@@ -83,7 +128,25 @@ Length: {len(self.sequence_string)}
     # Classmethod creating a Sequence Class from fastq file
     @classmethod
     def from_fastq(cls, text: str):
-        
+        """
+        Loads fastq sequence given in 'text' parameter.
+
+        Parameters
+        ----------
+        text : str
+            Fastq sequence with header and quality string.
+
+        Raises
+        ------
+        ValueError
+            If fastq file is too short (less than 4 lines) or fastq sequence is empty.
+
+        Returns
+        -------
+        Sequence
+            A new Sequence instance with header, sequence_string, and quality attributes.
+
+        """
         # creating headers and sequence_string
         
         splitted_text = text.strip().splitlines()
@@ -98,12 +161,24 @@ Length: {len(self.sequence_string)}
         if quality_string == '':
             raise ValueError("Quality string is empty. Please check your FASTQ file.")
         
-
         return cls(header, sequence_string, quality_string)
     
     @classmethod
-    def parse_fasta_file(cls, filepath):
-        
+    def parse_fasta_file(cls, filepath: str):
+        """
+        Create multiple Sequence classes from fasta file
+
+        Parameters
+        ----------
+        filepath : str
+            Path to fasta file
+
+        Yields
+        ------
+        Sequence
+            Each record in the input file as a Sequence instance.
+
+        """
         with open(filepath, 'r') as f:
             
             header, seq_lines = None, []
@@ -123,8 +198,21 @@ Length: {len(self.sequence_string)}
                 yield cls(header, ''.join(seq_lines), None)   
             
     @classmethod
-    def parse_fastq_file(cls, filepath):
-        
+    def parse_fastq_file(cls, filepath: str):
+        """
+        Create multiple Sequence classes from fastq file
+
+        Parameters
+        ----------
+        filepath : str
+            Path to fasta file
+
+         Yields
+         ------
+         Sequence
+             Each record in the input file as a Sequence instance.
+
+        """
         with open(filepath, 'r') as f:
             
             file = f.readlines()
@@ -144,7 +232,22 @@ Length: {len(self.sequence_string)}
                     
    # @disk_cache()
     def expensive_kmer(self):
+        """
+        Computationally expensive function (k-mer in this script)
+
+        Returns
+        -------
+        k_mers : dict[str:list]
+            
+        Dictionary with k (length of substrings) as keys and list of substrings as values
         
+        Examples
+        --------
+        >>> seq = Sequence.from_fasta(">s1\nATGC\n")
+        >>> seq.expensive_kmer()
+        {1: ['A','T','G','C'], 2: ['AT','TG','GC'], …}
+
+        """
         k = len(self.sequence_string)
         k_mers = {}
 
