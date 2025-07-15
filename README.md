@@ -1,7 +1,8 @@
-## Overview
+# Sequence Toolkit
 
-A lightweight, extensible bioinformatics toolkit for parsing multi‑record FASTA/FASTQ files and computing k‑mer counts with an efficient on‑disk caching mechanism. Includes a CLI for end‑to‑end processing,
-cache archiving, and pruning of old entries.
+A modular bioinformatics toolkit for parsing FASTA/FASTQ files, computing k‑mer counts with on‑disk caching, and running arbitrarily extensible “analyzer” plugins (e.g. GC content, motif search).
+
+---
 
 ## Features
 
@@ -17,21 +18,56 @@ cache archiving, and pruning of old entries.
 * Automatically creates cache directory
 * Loads from cache on hit, computes & saves on miss
 
-### `CLI (seq_toolkit.py)`:
+### **`AnalyzerMeta` metaclass**  
+* Auto‑registers every `Analyzer` subclass in a central `Analyzer.registry`  
+
+### **`Analyzer` (abstract base class)**  
+* Defines the `run(self, seq: Sequence) -> Any` interface  
+
+### **`Built‑in analyzers`**  
+* `GCContentAnalyzer`  
+* `MotifSearchAnalyzer(motif)`  
+* (Easily add more by subclassing `Analyzer`!)  
+
+### **`PluginManager`**  
+* Discovers & instantiates plugins by name  
+* Supports user‑specified order and dynamic additions at runtime  
+* Runs all analyzers on one or many sequences, returning nested result dicts
+
+---
+### `CLI (seqtools.py)`:
 * -i/--input: FASTA or FASTQ file
 *-o/--output: cache directory and location for per sentence and aggregated results (all_kmers.pkl)
 * --clear_cache: archive & prune cache entries older than 7 days
 
 ## Installation
 
-1. Clone repository:
 ```
 git clone https://github.com/Gierak245/OOP_bioinf
 cd OOP_bioinf
 ```
 *Note: Uses **only Python stdlib**; no external packages required.*
+
 ## Usage
 
+### **As a library**
+```
+from OOP_kmer_cache import Sequence
+from Analyzer import PluginManager, GCContentAnalyzer, MotifSearchAnalyzer
+
+# parse sequences
+records = Sequence.parse_fasta_file("example.fa")
+
+# configure and run analyzers
+pm = PluginManager({'GCContentAnalyzer':{}})
+pm.discover(['GCContentAnalyzer'])
+pm.add_analyzer(MotifSearchAnalyzer, {'motif':'ATG'}, order_position=1) # Now pm.instances should already include both analyzers
+
+# printing data from analyzer for parsed sequences
+for rec in records:
+    print(rec.header, pm.run_instances(rec))
+```
+### **CLI**
 ```
 python seqtools.py \
   -i path/to/input.fa \
