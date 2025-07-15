@@ -3,7 +3,6 @@ import os
 import re
 from abc import ABC, ABCMeta, abstractmethod
 from typing import Any, List, Dict, Type, Iterable
-sys.path.append(os.path.abspath(os.path.join(__file__, '..', '..', 'OOP')))
 from OOP_kmer_cache import Sequence
 
 class AnalyzerMeta(ABCMeta):
@@ -227,6 +226,7 @@ class PluginManager:
             Mapping from analyzer class name to its result for this sequence.
         """
         results: Dict[str, Any] = {}
+        
         for instance in self.instances:
             instance_name = type(instance).__name__
             try:
@@ -288,15 +288,4 @@ class PluginManager:
         self.order.insert(order_position, cls.__name__)
         print(f"\nAdded {cls.__name__}({kwargs});\nRebuilding plugin list…\n")
         self.discover(self.order, verbose=False)
-        
-
-                
-
-
-pm = PluginManager({'GCContentAnalyzer':{}})
-pm.discover(['GCContentAnalyzer'])
-pm.add_analyzer(MotifSearchAnalyzer, {'motif':'ATG'}, order_position=1)
-# Now pm.instances should already include both analyzers
-print([type(i).__name__ for i in pm.instances])
-
-pm.run_instances(Sequence('Seq1','GCGC', None))
+    

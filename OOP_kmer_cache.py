@@ -259,4 +259,3 @@ Length: {len(self.sequence_string)}
                 k_mers[i] = temp_list
         
         return k_mers
-        
