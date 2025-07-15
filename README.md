@@ -35,7 +35,7 @@ A modular bioinformatics toolkit for parsing FASTA/FASTQ files, computing k‑me
 * Runs all analyzers on one or many sequences, returning nested result dicts
 
 ---
-### `CLI (seq_toolkit.py)`:
+### `CLI (seqtools.py)`:
 * -i/--input: FASTA or FASTQ file
 *-o/--output: cache directory and location for per sentence and aggregated results (all_kmers.pkl)
 * --clear_cache: archive & prune cache entries older than 7 days
@@ -52,23 +52,22 @@ cd OOP_bioinf
 
 ### **As a library**
 ```
-from seq_toolkit import Sequence
+from OOP_kmer_cache import Sequence
 from Analyzer import PluginManager, GCContentAnalyzer, MotifSearchAnalyzer
 
 # parse sequences
 records = Sequence.parse_fasta_file("example.fa")
 
 # configure and run analyzers
-pm = PluginManager({
-    "GCContentAnalyzer": {},
-    "MotifSearchAnalyzer": {"motif": "ATG"}
-})
-pm.discover(["GCContentAnalyzer", "MotifSearchAnalyzer"])
+pm = PluginManager({'GCContentAnalyzer':{}})
+pm.discover(['GCContentAnalyzer'])
+pm.add_analyzer(MotifSearchAnalyzer, {'motif':'ATG'}, order_position=1) # Now pm.instances should already include both analyzers
 
+# printing data from analyzer for parsed sequences
 for rec in records:
     print(rec.header, pm.run_instances(rec))
 ```
-### CLI
+### **CLI**
 ```
 python seqtools.py \
   -i path/to/input.fa \
